@@ -1,0 +1,102 @@
+<!-- <p>Seleccione un archivo:</p> -->
+<div>
+  <input type="file" (change)="onFileSelected($event)" accept=".txt" id="file-input">
+  <input matInput type="month" name="input-date" id="input-date" [(ngModel)]="inputDate" required>
+  <!-- <button type="button" (click)="testDate()">Prueba</button> -->
+  <!-- <button class="button-primary" type="button" (click)="processLines()">Procesar</button> -->
+  <button mat-flat-button type="button" (click)="processLines()">Procesar</button>
+  <!-- <button type="button" class="btn btn-primary" (click)="writeFile()">Procesar</button> -->
+  <br><br>
+  <div>
+    <label for="input-data">Informacion documento leído</label>
+    <br>
+    <textarea [(ngModel)]="fileContent" name="input-data" id="input-data" cols="70" rows="20"></textarea>
+    <br>
+    <button mat-raised-button type="button" (click)="deleteData('input-data')">Limpiar</button>
+    <button mat-flat-button type="button" (click)="copyTable()">Copiar</button>
+  </div>
+
+  <div style="display: none;">
+    <label for="output-data">Informacion procesada:</label>
+    <br>
+    <textarea name="output-data" id="output-data"></textarea>
+    <br>
+    <button type="button" (click)="deleteData('output-data')">Limpiar</button>
+  </div>
+
+  <mat-form-field>
+    <mat-label>Buscar</mat-label>
+    <input matInput (keyup)="applyFilter($event)" placeholder="Ej. Juan, 13/4/2025" #input>
+  </mat-form-field>
+
+  <div class="mat-elevation-z8" style="justify-items: center;">
+    <table mat-table [dataSource]="dataSource" matSort #sort="matSort" style="min-width: auto; width: 700px;">
+
+      <!-- Fecha y Hora Column -->
+      <ng-container matColumnDef="datetime">
+        <th mat-header-cell *matHeaderCellDef>FECHA</th>
+        <td mat-cell *matCellDef="let row"> {{row[0]}} </td>
+      </ng-container>
+
+      <!-- Name Column -->
+      <ng-container matColumnDef="name">
+        <th mat-header-cell *matHeaderCellDef> NOMBRE </th>
+        <td mat-cell *matCellDef="let row"> {{row[1]}} </td>
+      </ng-container>
+
+      <!-- Ubi Column -->
+      <ng-container matColumnDef="ubi">
+        <th mat-header-cell *matHeaderCellDef> LUGAR </th>
+        <td mat-cell *matCellDef="let row"> {{row[2]}} </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+
+      <!-- Row shown when there is no matching data. -->
+      <tr class="mat-row" *matNoDataRow>
+        <td class="mat-cell" colspan="4">No data matching the filter ""</td>
+      </tr>
+    </table>
+
+    <mat-paginator #paginator [pageSizeOptions]="[5, 10, 25, 100]" aria-label="Select page of users" showFirstLastButtons></mat-paginator>
+  </div>
+
+  <!-- <mat-form-field>
+    <mat-label>Horizontal position</mat-label>
+    <mat-select [(value)]="horizontalPosition">
+      <mat-option value="start">Start</mat-option>
+      <mat-option value="center">Center</mat-option>
+      <mat-option value="end">End</mat-option>
+      <mat-option value="left">Left</mat-option>
+      <mat-option value="right">Right</mat-option>
+    </mat-select>
+  </mat-form-field>
+  <mat-form-field>
+    <mat-label>Vertical position</mat-label>
+    <mat-select [(value)]="verticalPosition">
+      <mat-option value="top">Top</mat-option>
+      <mat-option value="bottom">Bottom</mat-option>
+    </mat-select>
+  </mat-form-field> -->
+
+
+
+  <table id="table-information" style="position: absolute;left: -9999px;white-space: pre;">
+    <thead>
+      <tr>
+        <th>FECHA Y HORA</th>
+        <th>NOMBRE</th>
+        <th>LUGAR</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let item of arrayOutputFinal">
+        <td>{{ item[0] }}</td>
+        <td>{{ item[1] }}</td>
+        <td>{{ item[2] }}</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
