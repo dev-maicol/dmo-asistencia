@@ -1,19 +1,35 @@
 <!-- <p>Seleccione un archivo:</p> -->
 <div>
-  <input type="file" (change)="onFileSelected($event)" accept=".txt" id="file-input">
+  <input type="file" (change)="onFileSelected($event)" accept=".txt,.zip" id="file-input">
   <input matInput type="month" name="input-date" id="input-date" [(ngModel)]="inputDate" required>
   <!-- <button type="button" (click)="testDate()">Prueba</button> -->
   <!-- <button class="button-primary" type="button" (click)="processLines()">Procesar</button> -->
   <button mat-flat-button type="button" (click)="processLines()">Procesar</button>
   <!-- <button type="button" class="btn btn-primary" (click)="writeFile()">Procesar</button> -->
   <br><br>
-  <div>
-    <label for="input-data">Informacion documento leído</label>
-    <br>
-    <textarea [(ngModel)]="fileContent" name="input-data" id="input-data" cols="70" rows="20"></textarea>
-    <br>
-    <button mat-raised-button type="button" (click)="deleteData('input-data')">Limpiar</button>
-    <button mat-flat-button type="button" (click)="copyTable()">Copiar</button>
+  <div class="container">
+    <!-- <label for="input-data">Informacion documento leído</label> -->
+    <!-- <br> -->
+    <mat-expansion-panel (opened)="panelOpenState.set(true)" (closed)="panelOpenState.set(false)">
+      <mat-expansion-panel-header>
+        <mat-panel-title class="text-panel"> Información documento leído </mat-panel-title>
+        <mat-panel-description>
+          <!-- Currently I am {{panelOpenState() ? 'open' : 'closed'}} -->
+          @if (this.selectedFile) {
+            <mat-icon aria-hidden="false" aria-label="Icon state" fontIcon="check_box" style="color: #005cbb;"></mat-icon>
+          }@else {
+            <mat-icon aria-hidden="false" aria-label="Icon state" fontIcon="check_box_outline_blank"></mat-icon>
+          }
+        </mat-panel-description>
+      </mat-expansion-panel-header>
+      <!-- <p>I'm visible because I am open</p> -->
+      <textarea [(ngModel)]="fileContent" name="input-data" id="input-data"></textarea>
+    </mat-expansion-panel>
+
+    <div>
+      <button mat-raised-button type="button" (click)="deleteData('input-data')">Limpiar</button>
+      <button mat-flat-button type="button" (click)="copyTable()">Copiar</button>
+    </div>
   </div>
 
   <div style="display: none;">
@@ -24,7 +40,7 @@
     <button type="button" (click)="deleteData('output-data')">Limpiar</button>
   </div>
 
-  <mat-form-field>
+  <mat-form-field style="width: 300px;">
     <mat-label>Buscar</mat-label>
     <input matInput (keyup)="applyFilter($event)" placeholder="Ej. Juan, 13/4/2025" #input>
   </mat-form-field>

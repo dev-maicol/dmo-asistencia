@@ -1,4 +1,4 @@
-import {AfterViewInit, Component, ViewChild, inject} from '@angular/core';
+import {AfterViewInit, Component, ViewChild, inject, ChangeDetectionStrategy, signal} from '@angular/core';
 
 import { FormsModule } from '@angular/forms';
 
@@ -21,15 +21,22 @@ import {
 } from '@angular/material/snack-bar';
 import {MatSelectModule} from '@angular/material/select';
 
+import JSZip from 'jszip'; // si usas esModuleInterop
+
+import {MatExpansionModule} from '@angular/material/expansion';
+
+import {MatIconModule} from '@angular/material/icon';
+
 @Component({
   selector: 'app-form-file',
   imports: [ FormsModule, CommonModule, MatButtonModule, MatInputModule,
-    MatFormFieldModule, MatTableModule, MatSortModule, MatPaginatorModule, MatFormFieldModule, MatSelectModule, MatButtonModule
+    MatFormFieldModule, MatTableModule, MatSortModule, MatPaginatorModule, MatFormFieldModule, MatSelectModule, MatButtonModule, MatExpansionModule, MatIconModule
   ],
   templateUrl: './form-file.component.html',
   styleUrl: './form-file.component.css'
 })
 export class FormFileComponent {
+  readonly panelOpenState = signal(false);
 
   private _snackBar = inject(MatSnackBar);
 
@@ -90,14 +97,45 @@ export class FormFileComponent {
 
   writeFile(): void {
     if (this.selectedFile) {
-      const reader = new FileReader();
-      reader.onload = (e: ProgressEvent<FileReader>) => {
-        const result = e.target?.result;
-        if (typeof result === 'string') {
-          this.fileContent = result;
-        }
-      };
-      reader.readAsText(this.selectedFile);
+      const fileName = this.selectedFile.name.toLowerCase();
+      if(fileName.endsWith('.txt')){
+        const reader = new FileReader();
+        reader.onload = (e: ProgressEvent<FileReader>) => {
+          const result = e.target?.result;
+          if (typeof result === 'string') {
+            this.fileContent = result;
+          }
+        };
+        reader.readAsText(this.selectedFile);
+
+      }else if(fileName.endsWith('.zip')){
+        const reader = new FileReader();
+        reader.onload = async (e: ProgressEvent<FileReader>) => {
+          const arrayBuffer = e.target?.result;
+          if (arrayBuffer instanceof ArrayBuffer) {
+            try {
+              const zip = await JSZip.loadAsync(arrayBuffer);
+              // Buscar el primer archivo .txt (o uno específico si conoces el nombre)
+              const txtFileName = Object.keys(zip.files).find(name => name.endsWith('.txt'));
+
+              if (txtFileName) {
+                const txtFile = zip.files[txtFileName];
+                const textContent = await txtFile.async('text');
+                this.fileContent = textContent;
+                // console.log('Contenido extraído del .txt:', this.fileContent);
+              } else {
+                console.error('No se encontró ningún archivo .txt en el .zip');
+              }
+            } catch (error) {
+              console.error('Error al leer el archivo .zip:', error);
+            }
+          }
+        };
+
+        reader.readAsArrayBuffer(this.selectedFile);
+      }else{
+        console.error('Tipo de archivo no soportado.');
+      }
     } else {
       console.error('No file selected.');
     }
